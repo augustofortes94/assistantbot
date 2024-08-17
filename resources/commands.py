@@ -1,5 +1,5 @@
 import json
-from schemas import get_notfollowers_schema_followers, get_notfollowers_schema_following
+from .schemas import get_notfollowers_schema_followers, get_notfollowers_schema_following
 from .utils import defineLogs, validate_json
 
 user_states = {}

@@ -1,11 +1,11 @@
 import os
 import sys
 import telegram
-from commands import handle_files, notfollowers
+from resources.commands import handle_files, notfollowers
 from dotenv import load_dotenv
 from pathlib import Path
 from telegram.ext import CommandHandler, MessageHandler, filters, Application
-from utils import defineLogs
+from resources.utils import defineLogs
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent

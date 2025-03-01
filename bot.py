@@ -12,7 +12,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
 telegram_token = os.getenv('TELEGRAM_TOKEN')
-telegram_token = '7935795566:AAGer9cX3smN_8ydu-0abz-p3cWfqHzXk60'
 
 if os.getenv('MODE') == "dev":
     # Acceso local

@@ -1,7 +1,7 @@
 import os
 import sys
 import telegram
-from resources.commands import handle_files, notfollowers
+from resources.commands import fans, handle_files, notfollowers
 from dotenv import load_dotenv
 from pathlib import Path
 from telegram.ext import CommandHandler, MessageHandler, filters, Application
@@ -12,6 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
 telegram_token = os.getenv('TELEGRAM_TOKEN')
+telegram_token = '7935795566:AAGer9cX3smN_8ydu-0abz-p3cWfqHzXk60'
 
 if os.getenv('MODE') == "dev":
     # Acceso local
@@ -40,6 +41,7 @@ if __name__ == "__main__":
 application = Application.builder().token(telegram_token).build()
 
 # COMANDOS
+application.add_handler(CommandHandler("fans", fans))
 application.add_handler(CommandHandler("notfollowers", notfollowers))
 
 
@@ -48,7 +50,7 @@ application.add_handler(CommandHandler("notfollowers", notfollowers))
 
 
 # MANEJADOR DE MENSAJES SIN "/"
-#application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, messageHandler))
+#application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
 application.add_handler(MessageHandler(filters.Document.ALL, handle_files))
 
 # RUN

@@ -1,11 +1,11 @@
 import os
 import sys
 import telegram
-from resources.commands import fans, handle_files, notfollowers
+from resources.commands import fans, handle_files, notfollowers, help_def
 from dotenv import load_dotenv
 from pathlib import Path
 from telegram.ext import CommandHandler, MessageHandler, filters, Application
-from resources.utils import defineLogs
+from resources.utils import define_logs
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +29,7 @@ elif os.getenv('MODE') == "prod":
         print("CORRIENDO PRODUCCION...")
 
 else:
-    defineLogs().info("ERROR: No se especifico el MODE")
+    define_logs().info("ERROR: No se especifico el MODE")
     sys.exit
 
 # Creo el bot con el token
@@ -40,6 +40,7 @@ if __name__ == "__main__":
 application = Application.builder().token(telegram_token).build()
 
 # COMANDOS
+application.add_handler(CommandHandler("help", help_def))
 application.add_handler(CommandHandler("fans", fans))
 application.add_handler(CommandHandler("notfollowers", notfollowers))
 

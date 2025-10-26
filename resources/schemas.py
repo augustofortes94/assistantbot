@@ -47,10 +47,10 @@ def get_notfollowers_schema_following():
                                         "type": "object",
                                         "properties": {
                                             "href": {"type": "string", "format": "uri"},
-                                            "value": {"type": "string"},
                                             "timestamp": {"type": "integer"}
                                         },
-                                        "required": ["href", "value", "timestamp"]
+                                        # 'value' puede no estar presente en algunos exports
+                                        "required": ["href", "timestamp"]
                                     }
                                 }
                             },

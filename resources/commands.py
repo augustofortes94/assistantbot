@@ -2,31 +2,59 @@ import io
 import json
 import zipfile
 from .schemas import get_notfollowers_schema_followers, get_notfollowers_schema_following
-from .utils import defineLogs, validate_json
+from .utils import define_logs, validate_json
 
 # Diccionario para almacenar el estado de los usuarios
 user_states = {}
 
 async def message_handler(update, context):
     """Maneja mensajes recibidos."""
-    defineLogs().info(f"Mensaje recibido: {update.message.text}")
+    define_logs().info(f"Mensaje recibido: {update.message.text}")
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Mensaje recibido")
 
 # COMANDOS
 async def fans(update, context):
     """Inicia el proceso de carga de archivos para detectar seguidores que no sigues."""
     command = update.message.text
-    defineLogs().info(f"El usuario {update.effective_user['username']} consultó por {command}")
+    define_logs().info(f"El usuario {update.effective_user['username']} consultó por {command}")
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Por favor, sube el archivo .zip o los dos archivos .json.")
     user_states[update.effective_chat.id] = {'awaiting_files': True,
                                              'command': command,  # Guarda el comando ejecutado
                                              'files': {'followers': [], 'following': []}}
 
 
+async def help_def(update, context):
+    """Comando de ayuda"""
+    command = update.message.text
+    define_logs().info(f"El usuario {update.effective_user['username']} consultó por {command}")
+    text = ("Este bot te ayudara a detectar seguidores que no sigues en Instagram.\n\n"
+            + "/notfollowers - Detecta seguidores no mutuos.\n"
+            + "/fans - Detecta seguidores que no sigues.\n\n"
+            + "Para poder obtener los archivos necesarios, debes descargarlos desde la app de Instagram.\n\n"
+            + "Instrucciones para obtener los archivos:\n"
+            + "1. Abre la app de Instagram.\n"
+            + "2. Ve a tu Perfil.\n"
+            + "3. Ve a la seccion de 'Configuraciones' o 'Ajustes'.\n"
+            + "4. Busca la opcion de 'Centro de cuentas'.\n"
+            + "5. Selecciona la opcion de 'Tu informacion o permisos'.\n"
+            + "6. Selecciona la opcion de 'Exportar tu informacion' y veras un boton que dice 'Crear exportacion' debes presionarlo.\n"
+            + "7. Entre las opciones debes elegir 'Exportar al dispositivo'.\n"
+            + "8. Ahora veras diferentes secciones donde debes seleccionar los siguientes items:\n"
+            + "      - Personalizar informacion: debes poner borrar todos y que quede marcado solamente la opcion de 'Seguidores y Seguidos' en la seccion de 'Conexiones'.\n"
+            + "      - Intervalo de fechas: debes seleccionar 'Desde el principio'.\n"
+            + "      - Formato: debes seleccionar 'JSON'.\n"
+            + "      - Calidad del contenido multimedia: debes seleccionar 'Calidad mas baja'.\n"
+            + "9. Ahora veras un boton que dice 'Iniciar exportacion' debes presionarlo.\n\n"
+            + " Solo queda esperar a que se complete la exportacion lo cual puede tardar unos minutos (suelen enviar un mail avisando que ya esta el archivo).\n"
+            + " Una vez completada la exportacion, debes descargar el archivo y enviarlo en este chat.\n\n\n"
+            + "Envia /help para obtener ayuda.")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+
 async def notfollowers(update, context):
     """Inicia el proceso de carga de archivos para detectar seguidores no mutuos."""
     command = update.message.text
-    defineLogs().info(f"El usuario {update.effective_user['username']} consultó por {command}")
+    define_logs().info(f"El usuario {update.effective_user['username']} consultó por {command}")
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Por favor, sube el archivo .zip o los dos archivos .json.")
     user_states[update.effective_chat.id] = {'awaiting_files': True,
                                              'command': command,  # Guarda el comando ejecutado
@@ -57,10 +85,10 @@ async def handle_files(update, context):
         else:
             await context.bot.send_message(chat_id=chat_id, text="Por favor, sube solo archivos .json o .zip.")
     except ValueError as ve:
-        defineLogs().error(ve)
+        define_logs().error(ve)
         await context.bot.send_message(chat_id=chat_id, text=str(ve))
     except Exception as err:
-        defineLogs().error(f"Error al procesar el archivo: {err}")
+        define_logs().error(f"Error al procesar el archivo: {err}")
         await context.bot.send_message(chat_id=chat_id, text=f"Error al procesar el archivo: {err}")
 
 
@@ -90,9 +118,13 @@ async def process_json_file(chat_id, file_byte_array, context, command):
             del file_byte_array
         else:
             await context.bot.send_message(chat_id=chat_id, text="Archivo recibido, por favor sube el segundo archivo .json.")
+    except ValueError as ve:
+        define_logs().error(str(ve))
+        await context.bot.send_message(chat_id=chat_id, text=str(ve))
     except Exception as err:
-        defineLogs().error(f"Error al procesar los archivos json: {err}")
+        define_logs().error(f"Error al procesar los archivos json: {err}")
         await context.bot.send_message(chat_id=chat_id, text=f"Error al procesar los archivos json: {err}")
+
 
 async def process_zip_file(chat_id, file_byte_array, context, command):
     """Procesa archivos ZIP y extrae los JSON requeridos, liberando memoria después."""
@@ -123,8 +155,11 @@ async def process_zip_file(chat_id, file_byte_array, context, command):
             
         # Forzar la liberación de memoria
         del file_byte_array
+    except ValueError as ve:
+        define_logs().error(str(ve))
+        await context.bot.send_message(chat_id=chat_id, text=str(ve))
     except Exception as err:
-        defineLogs().error(f"Error al procesar el archivo ZIP: {err}")
+        define_logs().error(f"Error al procesar el archivo ZIP: {err}")
         await context.bot.send_message(chat_id=chat_id, text=f"Error al procesar el archivo ZIP: {err}")
 
 
@@ -145,12 +180,14 @@ def extract_usernames_followers(data):
     except Exception as err:
         raise ValueError(f"Error extrayendo los nombres de usuario de seguidores: {err}")
 
+
 def extract_usernames_following(json_data):
     """Extrae los nombres de usuario de la lista de seguidos."""
     try:
-        return {entry['string_list_data'][0]['value'] for entry in json_data['relationships_following']}
+        return {entry['title'] for entry in json_data['relationships_following']}
     except Exception as err:
         raise ValueError(f"Error extrayendo los nombres de usuario de seguidos: {err}")
+
 
 def process_files(followers, following, command):
     """Compara listas de seguidores y seguidos para encontrar usuarios que no te siguen de vuelta."""

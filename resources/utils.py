@@ -1,7 +1,7 @@
 import logging
 from jsonschema import validate, ValidationError
 
-def defineLogs():
+def define_logs():
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s,"
     )
